@@ -10,7 +10,7 @@ import androidx.room.Query
 interface TaskDAO {
 
     @Insert
-    suspend fun insertTask(task:TaskModel):Long
+    fun insertTask(task:TaskModel):Long
 
     @Query("SELECT * FROM TaskModel WHERE isFinished!=-1")
     fun getAllTask():LiveData<List<TaskModel>>
