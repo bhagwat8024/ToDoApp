@@ -28,11 +28,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/TaskLayoutMargin"
-        android:layout_marginEnd="16dp"
         app:hintTextColor="@color/colorAccent"
         app:boxStrokeColor="@color/colorAccent"
         >
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/titleEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lines="1"
@@ -55,11 +55,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/TaskLayoutMargin"
-        android:layout_marginEnd="16dp"
         app:hintTextColor="@color/colorAccent"
         app:boxStrokeColor="@color/colorAccent"
         >
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/taskDesc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter Your Task"
@@ -82,7 +82,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/TaskLayoutMargin"
-        android:layout_marginEnd="16dp"
         app:hintTextColor="@color/colorAccent"
         app:boxStrokeColor="@color/colorAccent"
         >
@@ -105,7 +104,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/TaskLayoutMargin"
-        android:layout_marginEnd="16dp"
         app:hintTextColor="@color/colorAccent"
         app:boxStrokeColor="@color/colorAccent"
         android:visibility="gone"
@@ -113,22 +111,28 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/timieEdit"
+            android:id="@+id/timeEdit"
             android:clickable="true"
             android:focusable="false"
             android:cursorVisible="false"
-            android:drawableEnd="@drawable/ic_baseline_calendar_today_24"
+            android:drawableEnd="@drawable/ic_baseline_access_time_24"
             android:drawableTint="@color/colorAccent"
-            android:hint="Set Date"
+            android:hint="Set Time"
             android:textSize="18sp"
             android:paddingHorizontal="8dp"
             />
     </com.google.android.material.textfield.TextInputLayout>
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/labelSpinner"
+        style="@style/TaskLayoutMargin"
+        />
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/saveTask"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:layout_marginEnd="16dp"
         style="@style/TaskLayoutMargin"
         android:text="Save Task"
         android:paddingVertical="8dp"
