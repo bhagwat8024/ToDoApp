@@ -13,5 +13,5 @@ data class TaskModel (
     var time:Long,
     var isFinished:Int=-1,
     @PrimaryKey(autoGenerate = true)
-    var id:Long
+    var id:Long=0
         )

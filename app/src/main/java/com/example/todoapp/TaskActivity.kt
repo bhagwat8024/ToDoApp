@@ -11,6 +11,10 @@ import androidx.room.Room
 import com.example.todoapp.DataBase.TaskDataBase
 import com.example.todoapp.DataBase.TaskModel
 import kotlinx.android.synthetic.main.activity_task.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.sql.Time
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,11 +27,11 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var datePickerListener: DatePickerDialog.OnDateSetListener
     lateinit var timePickerListener: TimePickerDialog.OnTimeSetListener
     val labels = arrayListOf("Personal","Professional","Shopping","Budget")
+    var finalDate:Long=0L
+    var finalTime:Long=0L
 
     val db by lazy {
-        Room.databaseBuilder(this,TaskDataBase::class.java, DB_NAME)
-            .allowMainThreadQueries()
-            .build()
+        TaskDataBase.getDatabase(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,9 +39,11 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_task)
         dateEdit.setOnClickListener(this)
         timeEdit.setOnClickListener(this)
-        saveTask.setOnClickListener(this)
+        saveTask.setOnClickListener{
+            saveTask()
+        }
         setUpSpinner()
-
+        Toast.makeText(this,db.hashCode().toString(),Toast.LENGTH_LONG).show()
     }
 
     private fun setUpSpinner() {
@@ -54,9 +60,6 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
             R.id.timeEdit->{
                 setTimeListener()
             }
-            R.id.saveTask->{
-                saveTask()
-            }
         }
     }
 
@@ -64,6 +67,15 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         val title = titleEdit.text.toString()
         val taskDesc = taskDesc.text.toString()
         val taskCategory = labelSpinner.selectedItem.toString()
+        db.getTaskDao().insertTask(
+                    TaskModel(
+                        title,
+                        taskDesc,
+                        taskCategory,
+                        finalDate,
+                        finalTime
+                    )
+                )
     }
 
     private fun setTimeListener() {
@@ -106,11 +118,13 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         val MyFormat = "EEE,d MMM YYYY"
         val sdf = SimpleDateFormat(MyFormat)
         dateEdit.setText(sdf.format(myCalendar.time))
+        finalDate = myCalendar.time.time
         timeInput.visibility = View.VISIBLE
     }
     private fun updateTime(){
         val MyFormat = "h:mm a"
         val sdf = SimpleDateFormat(MyFormat)
+        finalTime = myCalendar.time.time
         timeEdit.setText(sdf.format(myCalendar.time))
     }
 
