@@ -12,7 +12,7 @@ interface TaskDAO {
     @Insert
     fun insertTask(task:TaskModel):Long
 
-    @Query("SELECT * FROM TaskModel WHERE isFinished!=-1")
+    @Query("SELECT * FROM TaskModel WHERE isFinished==-1")
     fun getAllTask():LiveData<List<TaskModel>>
 
     @Query("UPDATE TaskModel SET isFinished=1 WHERE id=:id")

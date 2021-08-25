@@ -30,20 +30,15 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     var finalDate:Long=0L
     var finalTime:Long=0L
 
-    val db by lazy {
-        TaskDataBase.getDatabase(this)
-    }
+    val db = TaskDataBase.getDatabase(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task)
         dateEdit.setOnClickListener(this)
         timeEdit.setOnClickListener(this)
-        saveTask.setOnClickListener{
-            saveTask()
-        }
+        saveTask.setOnClickListener(this)
         setUpSpinner()
-        Toast.makeText(this,db.hashCode().toString(),Toast.LENGTH_LONG).show()
     }
 
     private fun setUpSpinner() {
@@ -59,6 +54,9 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
             }
             R.id.timeEdit->{
                 setTimeListener()
+            }
+            R.id.saveTask->{
+                saveTask()
             }
         }
     }

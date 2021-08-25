@@ -29,6 +29,8 @@ class TaskAdapter(val TaskList: List<TaskModel>): RecyclerView.Adapter<TaskAdapt
         holder.bind(TaskList[position])
     }
 
+    override fun getItemId(position:Int) = TaskList[position].id
+
     override fun getItemCount(): Int  = TaskList.size
 
     inner class TaskHolder(var itemview:View):RecyclerView.ViewHolder(itemview){

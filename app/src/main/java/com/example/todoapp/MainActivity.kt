@@ -1,17 +1,25 @@
 package com.example.todoapp
 
+import android.content.ClipData
 import android.content.Intent
+import android.graphics.*
+import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.SearchView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.Query
 import androidx.room.Room
 import com.example.todoapp.DataBase.TaskDataBase
 import com.example.todoapp.DataBase.TaskModel
@@ -31,8 +39,8 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         ToDoRV.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = adapter
+            layoutManager = GridLayoutManager(this@MainActivity,2,GridLayoutManager.VERTICAL,false)
+            adapter = this@MainActivity.adapter
         }
 
         db.getTaskDao().getAllTask().observe(this,Observer{
@@ -40,15 +48,101 @@ class MainActivity : AppCompatActivity() {
                 TaskList.clear()
                 TaskList.addAll(it)
                 adapter.notifyDataSetChanged()
-                Toast.makeText(this,TaskList.size.toString(),Toast.LENGTH_LONG).show()
             }
             else{
                 TaskList.clear()
-                Toast.makeText(this,"0",Toast.LENGTH_LONG).show()
                 adapter.notifyDataSetChanged()
             }
         })
-        Toast.makeText(this,db.hashCode().toString(),Toast.LENGTH_LONG).show()
+        initSwipe()
+    }
+
+    private fun initSwipe() {
+       val simpleItemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0,
+           ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
+           override fun onMove(
+               recyclerView: RecyclerView,
+               viewHolder: RecyclerView.ViewHolder,
+               target: RecyclerView.ViewHolder
+           ): Boolean  = false
+
+           override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+               val position = viewHolder.adapterPosition
+               if(direction==ItemTouchHelper.LEFT){
+                   db.getTaskDao().deleteTask(adapter.getItemId(position))
+               }
+               else if(direction==ItemTouchHelper.RIGHT){
+                   db.getTaskDao().finishTask(adapter.getItemId(position))
+               }
+           }
+
+/*
+           override fun onChildDraw(
+               canvas: Canvas,
+               recyclerView: RecyclerView,
+               viewHolder: RecyclerView.ViewHolder,
+               dX: Float,
+               dY: Float,
+               actionState: Int,
+               isCurrentlyActive: Boolean
+           ) {
+               if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                   val itemView = viewHolder.itemView
+
+                   val paint = Paint()
+                   var icon :Bitmap
+
+                   if (dX > 0) {
+                        icon  =BitmapFactory.decodeResource(resources,R.mipmap.check)
+                       paint.color = Color.parseColor("#388E3C")
+
+                       canvas.drawRect(
+                           itemView.left.toFloat(), itemView.top.toFloat(),
+                           itemView.left.toFloat() + dX, itemView.bottom.toFloat(), paint
+                       )
+
+                       canvas.drawBitmap(
+                           icon,
+                           itemView.left.toFloat(),
+                           itemView.top.toFloat() + (itemView.bottom.toFloat() - itemView.top.toFloat() - icon.height.toFloat()) / 2,
+                           paint
+                       )
+                   } else {
+                        icon = BitmapFactory.decodeResource(resources,R.mipmap.delete)
+                       paint.color = Color.parseColor("#D32F2F")
+
+                       canvas.drawRect(
+                           itemView.right.toFloat() + dX, itemView.top.toFloat(),
+                           itemView.right.toFloat(), itemView.bottom.toFloat(), paint
+                       )
+
+                       canvas.drawBitmap(
+                           icon,
+                           itemView.right.toFloat() - icon.width,
+                           itemView.top.toFloat() + (itemView.bottom.toFloat() - itemView.top.toFloat() - icon.height.toFloat()) / 2,
+                           paint
+                       )
+                   }
+                   viewHolder.itemView.translationX = dX
+
+               }
+               else{
+                   super.onChildDraw(
+                       canvas,
+                       recyclerView,
+                       viewHolder,
+                       dX,
+                       dY,
+                       actionState,
+                       isCurrentlyActive
+                   )
+               }
+           }
+ */
+       }
+
+        val itemTouchHelper = ItemTouchHelper(simpleItemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(ToDoRV)
     }
 
     fun goToTaskActivity(view:View){
@@ -57,7 +151,46 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu,menu)
+        val item = menu!!.findItem(R.id.search)
+        val searchView = item.actionView as androidx.appcompat.widget.SearchView
+
+        item.setOnActionExpandListener(object:MenuItem.OnActionExpandListener{
+            override fun onMenuItemActionExpand(item: MenuItem?): Boolean{
+                displayTask()
+                return true
+            }
+            override fun onMenuItemActionCollapse(item: MenuItem?):Boolean{
+                displayTask()
+                return true
+            }
+        })
+        searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener,
+            androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if(!newText.isNullOrEmpty()){
+                    displayTask(newText)
+                }
+                return true
+            }
+        })
         return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun displayTask(query: String = ""){
+            db.getTaskDao().getAllTask().observe(this, Observer {
+                if(!it.isNullOrEmpty()){
+                    TaskList.clear()
+                    TaskList.addAll(
+                        it.filter {task->
+                            task.title.contains(query,true)
+                        }
+                    )
+                    adapter.notifyDataSetChanged()
+                }
+            })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

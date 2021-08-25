@@ -127,6 +127,16 @@
         android:layout_height="wrap_content"
         android:id="@+id/labelSpinner"
         style="@style/TaskLayoutMargin"
+        android:padding="8dp"
+        />
+    <Switch
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/TaskLayoutMargin"
+        android:hint="Set Reminder"
+        android:padding="8dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
         />
     <com.google.android.material.button.MaterialButton
         android:id="@+id/saveTask"

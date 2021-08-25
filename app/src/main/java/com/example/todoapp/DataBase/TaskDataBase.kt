@@ -11,23 +11,23 @@ import java.util.concurrent.locks.Lock
 abstract class TaskDataBase: RoomDatabase() {
     abstract fun getTaskDao():TaskDAO
     companion object{
-        private var Instance:TaskDataBase? = null
+        private var INSTANCE:TaskDataBase? = null
         fun getDatabase(context: Context):TaskDataBase{
-            var tempInstance = Instance
+            var tempInstance = INSTANCE
             if(tempInstance!=null){
                 return tempInstance
             }
             synchronized(this){
-                tempInstance = Room.databaseBuilder(
+                val instance = Room.databaseBuilder(
                     context.applicationContext,
                     TaskDataBase::class.java,
                     DB_NAME
                 )
                     .allowMainThreadQueries()
                     .build()
+                INSTANCE = instance
+                return instance
             }
-            Instance = tempInstance
-            return Instance!!
         }
     }
 }
